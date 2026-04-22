@@ -1,0 +1,13 @@
+{
+  "name": "yb-staff-app",
+  "version": "1.0.0",
+  "description": "Yousaf Brothers Staff Management App",
+  "main": "index.html",
+  "scripts": {
+    "start": "serve ."
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "serve": "^14.2.1"
+  }
+}
