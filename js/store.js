@@ -45,7 +45,9 @@ const defaultData = () => ({
     outsideAccounts: [],
     accountLedger: [],
     loans: [],
-    loanTransactions: []
+    loanTransactions: [],
+    sentPaymentsAccounts: [],
+    sentPaymentsLedger: []
 });
 
 const initializeDB = () => {
@@ -328,25 +330,87 @@ export const DB = {
     return entry;
   },
   deleteLoanTransaction: (id) => {
-    const d = getLocalDB();
-    if (!d.loans) d.loans = [];
-    if (!d.loanTransactions) d.loanTransactions = [];
-    const idx = d.loanTransactions.findIndex(t => t.id == id);
-    if (idx !== -1) {
-        const entry = d.loanTransactions[idx];
-        const loan = d.loans.find(l => l.id == entry.loanId);
-        if (loan) {
-            const amt = parseFloat(entry.amount) || 0;
-            if (entry.type === 'borrow') {
-                loan.balance -= amt;
-            } else if (entry.type === 'payback') {
-                loan.balance += amt;
+        const d = getLocalDB();
+        if (!d.loans) d.loans = [];
+        if (!d.loanTransactions) d.loanTransactions = [];
+        const idx = d.loanTransactions.findIndex(t => t.id == id);
+        if (idx !== -1) {
+            const entry = d.loanTransactions[idx];
+            const loan = d.loans.find(l => l.id == entry.loanId);
+            if (loan) {
+                const amt = parseFloat(entry.amount) || 0;
+                if (entry.type === 'borrow') {
+                    loan.balance -= amt;
+                } else if (entry.type === 'payback') {
+                    loan.balance += amt;
+                }
             }
+            d.loanTransactions.splice(idx, 1);
+            saveLocalDB(d);
         }
-        d.loanTransactions.splice(idx, 1);
+    },
+    // Sent Payments (Bheji Gai Raqam)
+    getSentPaymentsAccounts: () => {
+        const d = getLocalDB();
+        if (!d.sentPaymentsAccounts) d.sentPaymentsAccounts = [];
+        return d.sentPaymentsAccounts;
+    },
+    getSentPaymentsAccountById: (id) => {
+        const d = getLocalDB();
+        if (!d.sentPaymentsAccounts) d.sentPaymentsAccounts = [];
+        return d.sentPaymentsAccounts.find(a => a.id == id);
+    },
+    addSentPaymentsAccount: (acc) => {
+        const d = getLocalDB();
+        if (!d.sentPaymentsAccounts) d.sentPaymentsAccounts = [];
+        if (!d.sentPaymentsLedger) d.sentPaymentsLedger = [];
+        acc.id = Date.now();
+        acc.balance = 0;
+        d.sentPaymentsAccounts.push(acc);
         saveLocalDB(d);
-    }
-  },
+        return acc;
+    },
+    deleteSentPaymentsAccount: (id) => {
+        const d = getLocalDB();
+        if (!d.sentPaymentsAccounts) d.sentPaymentsAccounts = [];
+        if (!d.sentPaymentsLedger) d.sentPaymentsLedger = [];
+        d.sentPaymentsAccounts = d.sentPaymentsAccounts.filter(a => a.id != id);
+        d.sentPaymentsLedger = d.sentPaymentsLedger.filter(l => l.accountId != id);
+        saveLocalDB(d);
+    },
+    getSentPaymentsLedger: (accountId) => {
+        const d = getLocalDB();
+        if (!d.sentPaymentsLedger) d.sentPaymentsLedger = [];
+        return d.sentPaymentsLedger.filter(l => l.accountId == accountId);
+    },
+    addSentPaymentsEntry: (entry) => {
+        const d = getLocalDB();
+        if (!d.sentPaymentsAccounts) d.sentPaymentsAccounts = [];
+        if (!d.sentPaymentsLedger) d.sentPaymentsLedger = [];
+        entry.id = Date.now();
+        d.sentPaymentsLedger.push(entry);
+        const acc = d.sentPaymentsAccounts.find(a => a.id == entry.accountId);
+        if (acc) {
+            acc.balance += parseFloat(entry.amount) || 0;
+        }
+        saveLocalDB(d);
+        return entry;
+    },
+    deleteSentPaymentsEntry: (id) => {
+        const d = getLocalDB();
+        if (!d.sentPaymentsAccounts) d.sentPaymentsAccounts = [];
+        if (!d.sentPaymentsLedger) d.sentPaymentsLedger = [];
+        const idx = d.sentPaymentsLedger.findIndex(l => l.id == id);
+        if (idx !== -1) {
+            const entry = d.sentPaymentsLedger[idx];
+            const acc = d.sentPaymentsAccounts.find(a => a.id == entry.accountId);
+            if (acc) {
+                acc.balance -= parseFloat(entry.amount) || 0;
+            }
+            d.sentPaymentsLedger.splice(idx, 1);
+            saveLocalDB(d);
+        }
+    },
 
   getDashboardStats: () => {
     const d = getLocalDB();

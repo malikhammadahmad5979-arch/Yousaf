@@ -12,7 +12,7 @@ import { renderRoznamcha } from './views/roznamcha.js';
 import { renderUdhaar } from './views/creditLedger.js';
 import { renderLogin } from './views/login.js';
 import { renderAdmin } from './views/admin.js';
-import { renderLoanManagement } from './views/loanManagement.js';
+import { renderSentPayments } from './views/sentPayments.js';
 
 // Setup Mock DB
 DB.init();
@@ -44,6 +44,9 @@ const sidebarNavHtml = `
     <a class="nav-item" data-route="credit-ledger" onclick="window.router.navigate('credit-ledger')">
         <i class="ri-user-add-line"></i> Udhaar Khata / Account Books
     </a>
+    <a class="nav-item" data-route="sent-payments" onclick="window.router.navigate('sent-payments')">
+        <i class="ri-arrow-up-circle-line"></i> Sent Payments (Bheji Raqam)
+    </a>
     <a class="nav-item" data-route="loan-management" onclick="window.router.navigate('loan-management')">
         <i class="ri-hand-coin-line"></i> Loan Management (Karza)
     </a>
@@ -67,6 +70,7 @@ Router.add('credit-ledger', renderUdhaar);
 Router.add('invoice', renderInvoice);
 Router.add('settings', renderSettings);
 Router.add('loan-management', renderLoanManagement);
+Router.add('sent-payments', renderSentPayments);
 
 window.router = Router;
 
