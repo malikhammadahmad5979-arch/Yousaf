@@ -12,6 +12,7 @@ import { renderRoznamcha } from './views/roznamcha.js';
 import { renderUdhaar } from './views/creditLedger.js';
 import { renderLogin } from './views/login.js';
 import { renderAdmin } from './views/admin.js';
+import { renderLoanManagement } from './views/loanManagement.js';
 import { renderSentPayments } from './views/sentPayments.js';
 
 // Setup Mock DB
